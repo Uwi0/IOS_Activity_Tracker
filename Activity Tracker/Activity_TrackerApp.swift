@@ -1,17 +1,11 @@
-//
-//  Activity_TrackerApp.swift
-//  Activity Tracker
-//
-//  Created by dwi prasetyo on 13/09/24.
-//
-
 import SwiftUI
+import SwiftData
 
 @main
 struct Activity_TrackerApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
-        }
+            ActivityView()
+        }.modelContainer(for: ActivityModel.self)
     }
 }
