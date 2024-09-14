@@ -54,8 +54,8 @@
 		FB9EAA832C94364E00BE8E2D /* Activity Tracker */ = {
 			isa = PBXGroup;
 			children = (
-				FB9EAA862C94364E00BE8E2D /* ActivityView.swift */,
-				FB9EAA932C9436FD00BE8E2D /* ActivityModel.swift */,
+				FB9EAA962C94394700BE8E2D /* view */,
+				FB9EAA952C94394200BE8E2D /* model */,
 				FB9EAA842C94364E00BE8E2D /* Activity_TrackerApp.swift */,
 				FB9EAA882C94364F00BE8E2D /* Assets.xcassets */,
 				FB9EAA8A2C94364F00BE8E2D /* Activity_Tracker.entitlements */,
@@ -70,6 +70,22 @@
 				FB9EAA8C2C94364F00BE8E2D /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		FB9EAA952C94394200BE8E2D /* model */ = {
+			isa = PBXGroup;
+			children = (
+				FB9EAA932C9436FD00BE8E2D /* ActivityModel.swift */,
+			);
+			path = model;
+			sourceTree = "<group>";
+		};
+		FB9EAA962C94394700BE8E2D /* view */ = {
+			isa = PBXGroup;
+			children = (
+				FB9EAA862C94364E00BE8E2D /* ActivityView.swift */,
+			);
+			path = view;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
