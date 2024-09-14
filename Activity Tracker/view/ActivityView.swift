@@ -13,6 +13,21 @@ struct ActivityView: View {
     @State private var currentActivity: ActivityModel? = nil
     @State private var selectedCount: Int? = nil
     
+    private var totalHours: Double {
+        activities.reduce(0.0){ total, activity in
+            total + activity.hoursPerDay
+        }
+    }
+    private var remainingHours: Double {
+        24 - totalHours
+    }
+    
+    private var maxHourOfSelected: Double {
+        remainingHours + hoursPerDay
+    }
+    
+    private let step: Double = 1
+    
     var body: some View {
         NavigationStack {
             VStack {
@@ -29,10 +44,48 @@ struct ActivityView: View {
                         .cornerRadius(5)
                     }
                 }
+                .chartAngleSelection(value: $selectedCount)
+                
+                List(activities) { activity in
+                    Text(activity.name)
+                        .onTapGesture {
+                            withAnimation {
+                                currentActivity = activity
+                                hoursPerDay = activity.hoursPerDay
+                            }
+                        }
+                }
+                .listStyle(.plain)
+                .scrollIndicators(.hidden)
+                
+                if let currentActivity {
+                    Slider(
+                        value: $hoursPerDay,
+                        in: 0...maxHourOfSelected,
+                        step: step
+                    )
+                    .onChange(of: hoursPerDay){ oldValue, newValue in
+                        
+                    }
+                }
+                
+                Button("Add"){
+                    addActivity()
+                }.buttonStyle(.borderedProminent)
+                    .disabled(remainingHours <= 0)
+                
             }
             .padding()
             .navigationTitle("Activity Tracker")
         }
+    }
+    
+    private func addActivity() {
+        
+    }
+    
+    private func deleteActivity(at offset: IndexSet) {
+        
     }
     
     private func outterRadiusWhen(_ isSelected: Bool) -> MarkDimension {
