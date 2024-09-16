@@ -135,7 +135,13 @@ struct ActivityView: View {
     }
     
     private func getSelected(value: Int) {
-        
+        var accumulativeHourPerDay = 0.0
+        if let activity = activities.first(where: { activity in
+            accumulativeHourPerDay += activity.hoursPerDay
+            return Int(accumulativeHourPerDay) >= value
+        }) {
+            currentActivity = activity
+        }
     }
     
     private func outterRadiusWhen(name: String) -> MarkDimension {
