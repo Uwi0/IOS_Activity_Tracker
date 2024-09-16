@@ -31,29 +31,38 @@ struct ActivityView: View {
     var body: some View {
         NavigationStack {
             VStack {
-                Chart {
-                    let isSelected: Bool = true
-                    ForEach(activities) { activity in
-                        SectorMark(
-                            angle: .value("Activities", activity.hoursPerDay),
-                            innerRadius: .ratio(0.6),
-                            outerRadius: outterRadiusWhen(isSelected),
-                            angularInset: 1
-                        )
-                        .foregroundStyle(.red)
-                        .cornerRadius(5)
-                    }
-                }
-                .chartAngleSelection(value: $selectedCount)
-                
-                List(activities) { activity in
-                    ActivityRow(activity: activity)
-                        .onTapGesture {
-                            withAnimation {
-                                currentActivity = activity
-                                hoursPerDay = activity.hoursPerDay
-                            }
+                if activities.isEmpty {
+                    ContentUnavailableView("Enter an Activity", systemImage: "list.dash")
+                } else {
+                    Chart {
+                        let isSelected: Bool = true
+                        ForEach(activities) { activity in
+                            SectorMark(
+                                angle: .value("Activities", activity.hoursPerDay),
+                                innerRadius: .ratio(0.6),
+                                outerRadius: outterRadiusWhen(isSelected),
+                                angularInset: 1
+                            )
+                            .foregroundStyle(.red)
+                            .cornerRadius(5)
                         }
+                    }
+                    .chartAngleSelection(value: $selectedCount)
+                }
+                
+                List {
+                    ForEach(activities) { activity in
+                        ActivityRow(activity: activity)
+                            .contentShape(Rectangle())
+                            .listRowBackground(selectedColorItemBy(name: activity.name))
+                            .onTapGesture {
+                                withAnimation {
+                                    currentActivity = activity
+                                    hoursPerDay = activity.hoursPerDay
+                                }
+                            }
+                    }
+                    .onDelete(perform: deleteActivity)
                 }
                 .listStyle(.plain)
                 .scrollIndicators(.hidden)
@@ -64,14 +73,14 @@ struct ActivityView: View {
                     .clipShape(.rect(cornerRadius: 10))
                     .shadow(color: .gray, radius: 2, x: 0, y: 2)
                 
-                if let currentActivity {
+                if currentActivity != nil {
                     Slider(
                         value: $hoursPerDay,
                         in: 0...maxHourOfSelected,
                         step: step
                     )
                     .onChange(of: hoursPerDay){ oldValue, newValue in
-                        
+                        editActivityHour(newValue)
                     }
                 }
                 
@@ -83,6 +92,14 @@ struct ActivityView: View {
             }
             .padding()
             .navigationTitle("Activity Tracker")
+            .toolbar{ EditButton().onChange(of: selectedCount){ oldValue, newValue in
+                if let newValue {
+                    withAnimation {
+                        getSelected(value: newValue)
+                    }
+                }
+            }
+            }
         }
     }
     
@@ -101,13 +118,32 @@ struct ActivityView: View {
         })
     }
     
+    private func editActivityHour(_ newValue: Double) {
+        if let index = self.activities.firstIndex(where: { activity in
+            activity.name == currentActivity?.name
+        }){
+            activities[index].hoursPerDay = newValue
+        }
+    }
+    
     private func deleteActivity(at offset: IndexSet) {
+        offset.forEach { index in
+            let activity = activities[index]
+            context.delete(activity)
+        }
+    }
+    
+    private func getSelected(value: Int) {
         
     }
     
     private func outterRadiusWhen(_ isSelected: Bool) -> MarkDimension {
         let radius = isSelected ? 1.05 : 0.95
         return .ratio(radius)
+    }
+    
+    private func selectedColorItemBy(name: String) -> Color {
+        currentActivity?.name == name ? .blue.opacity(0.3) : .clear
     }
 }
 
