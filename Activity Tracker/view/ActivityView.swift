@@ -35,16 +35,16 @@ struct ActivityView: View {
                     ContentUnavailableView("Enter an Activity", systemImage: "list.dash")
                 } else {
                     Chart {
-                        let isSelected: Bool = true
                         ForEach(activities) { activity in
                             SectorMark(
                                 angle: .value("Activities", activity.hoursPerDay),
                                 innerRadius: .ratio(0.6),
-                                outerRadius: outterRadiusWhen(isSelected),
+                                outerRadius: outterRadiusWhen(name: activity.name),
                                 angularInset: 1
                             )
-                            .foregroundStyle(.red)
+                            .foregroundStyle(by: .value("activity", activity.name))
                             .cornerRadius(5)
+                            .opacity(selectedOpacity(name: activity.name))
                         }
                     }
                     .chartAngleSelection(value: $selectedCount)
@@ -73,7 +73,7 @@ struct ActivityView: View {
                     .clipShape(.rect(cornerRadius: 10))
                     .shadow(color: .gray, radius: 2, x: 0, y: 2)
                 
-                if currentActivity != nil {
+                if let currentActivity {
                     Slider(
                         value: $hoursPerDay,
                         in: 0...maxHourOfSelected,
@@ -105,6 +105,7 @@ struct ActivityView: View {
     
     private func addActivity() {
         if !newName.isEmpty && activityAlreadyAdded() {
+            hoursPerDay = 0
             let activity = ActivityModel(name: newName, hoursPerDay: hoursPerDay)
             context.insert(activity)
             newName = ""
@@ -120,7 +121,7 @@ struct ActivityView: View {
     
     private func editActivityHour(_ newValue: Double) {
         if let index = self.activities.firstIndex(where: { activity in
-            activity.name == currentActivity?.name
+            isSelected(name: activity.name)
         }){
             activities[index].hoursPerDay = newValue
         }
@@ -137,13 +138,21 @@ struct ActivityView: View {
         
     }
     
-    private func outterRadiusWhen(_ isSelected: Bool) -> MarkDimension {
-        let radius = isSelected ? 1.05 : 0.95
+    private func outterRadiusWhen(name: String) -> MarkDimension {
+        let radius = isSelected(name: name) ? 1.05 : 0.95
         return .ratio(radius)
     }
     
     private func selectedColorItemBy(name: String) -> Color {
-        currentActivity?.name == name ? .blue.opacity(0.3) : .clear
+        isSelected(name: name) ? .blue.opacity(0.3) : .clear
+    }
+    
+    private func selectedOpacity(name: String) -> CGFloat{
+        isSelected(name: name) ? 1 : 0.7
+    }
+    
+    private func isSelected(name: String) -> Bool {
+        currentActivity?.name == name
     }
 }
 
